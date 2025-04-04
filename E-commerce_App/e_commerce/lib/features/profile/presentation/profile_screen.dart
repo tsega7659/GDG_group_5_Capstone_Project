@@ -11,7 +11,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Set the background color explicitly
+      backgroundColor: Colors.white, 
       body: SingleChildScrollView(
         child: Container(
           color: Colors.white,
@@ -33,7 +33,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           image: DecorationImage(
                             image: AssetImage(
                               'assets/images/image1.jpeg',
-                            ), // Replace with your image URL
+                            ), 
                             fit: BoxFit.cover,
                           ),
                         ),

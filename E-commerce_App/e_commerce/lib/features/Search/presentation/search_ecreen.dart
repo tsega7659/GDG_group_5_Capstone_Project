@@ -98,7 +98,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   crossAxisCount: 2,
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
-                  childAspectRatio: 0.75, // Adjusted for better layout
+                  childAspectRatio: 0.75, 
                 ),
                 itemCount: 6,
                 itemBuilder: (context, index) {
@@ -113,7 +113,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       children: [
                         Stack(
                           children: [
-                            // Image Section
+                          
                             Container(
                               height: 150,
                               width: double.infinity,
@@ -129,7 +129,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                 ),
                               ),
                             ),
-                            // Favorite Icon
+                            
                             Positioned(
                               top: 10,
                               right: 10,
@@ -172,7 +172,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              Spacer(), // Pushes the add button to the right
+                              Spacer(),
                               Container(
                                 height: 30,
                                 width: 30,

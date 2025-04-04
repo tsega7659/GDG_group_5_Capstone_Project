@@ -50,8 +50,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
             _currentIndex = index;
           });
         },
-        unselectedItemColor: Colors.grey, // Color for the selected icon
-        selectedItemColor: Color(0xFF6055DB), // Color for the unselected icons
+        unselectedItemColor: Colors.grey, 
+        selectedItemColor: Color(0xFF6055DB), 
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home, size: 40), label: ''),
           BottomNavigationBarItem(
