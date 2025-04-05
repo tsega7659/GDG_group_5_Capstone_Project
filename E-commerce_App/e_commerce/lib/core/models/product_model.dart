@@ -1,5 +1,5 @@
 class Product {
-  final double id; // Kept as int since API returns integer
+  final double id;
   final String title;
   final double price;
   final String? description;
@@ -17,20 +17,15 @@ class Product {
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
-      id:
-          json['id'] is double
-              ? json['id'] as double
-              : double.parse(
-                json['id'].toString(),
-              ), // Handle both int and string cases
-      title: json['title'] as String? ?? '', // Fallback to empty string if null
-      price:
-          (json['price'] is num
-                  ? json['price']
-                  : double.parse(json['price'].toString()))
-              as double, // Handle number parsing
-      description: json['description'] as String?, // Nullable
-      image: json['image'] as String? ?? '', // Fallback to empty string if null
+      id: (json['id'] is int) 
+          ? (json['id'] as int).toDouble() 
+          : (json['id'] as num).toDouble(), // Handle int or double
+      title: json['title'] as String? ?? '',
+      price: (json['price'] is int) 
+          ? (json['price'] as int).toDouble() 
+          : (json['price'] as num).toDouble(), // Handle int or double
+      description: json['description'] as String?,
+      image: json['image'] as String? ?? '',
     );
   }
 }

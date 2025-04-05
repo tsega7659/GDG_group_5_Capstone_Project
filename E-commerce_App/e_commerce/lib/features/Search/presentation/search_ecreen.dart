@@ -22,8 +22,7 @@ class _SearchScreenState extends State<SearchScreen> {
   void initState() {
     super.initState();
     _fetchProducts();
-      print('Fetching products...');
-
+    print('Fetching products...');
   }
 
   Future<void> _fetchProducts() async {
@@ -38,9 +37,9 @@ class _SearchScreenState extends State<SearchScreen> {
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         setState(() {
-          // _products = data.map((json) => Product.fromJson(json)).toList();
-          // _filteredProducts = _products;
-          print(data);
+          _products = data.map((json) => Product.fromJson(json)).toList();
+          _filteredProducts = _products;
+          // print(data);
           isLoading = false;
         });
       } else {
@@ -50,6 +49,7 @@ class _SearchScreenState extends State<SearchScreen> {
       setState(() {
         isLoading = false;
       });
+      print('Error: $e');
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Error searching products: $e')));
