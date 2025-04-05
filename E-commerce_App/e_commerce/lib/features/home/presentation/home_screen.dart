@@ -7,7 +7,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Text(
-        'Home Screen',
+        'Home Screen welcome to E-commerce App',
         style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
       ),
     );
