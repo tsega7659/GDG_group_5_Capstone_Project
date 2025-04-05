@@ -1,4 +1,8 @@
+import 'dart:convert';
+
+import 'package:e_commerce/core/models/product_model.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -8,6 +12,72 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  List<Product> _products = [];
+  List<Product> _filteredProducts = [];
+  bool isLoading = false;
+  String _searchQuery = "All";
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProducts();
+      print('Fetching products...');
+
+  }
+
+  Future<void> _fetchProducts() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      print('#####################################3');
+      final url = Uri.parse("https://fakestoreapi.com/products");
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        setState(() {
+          // _products = data.map((json) => Product.fromJson(json)).toList();
+          // _filteredProducts = _products;
+          print(data);
+          isLoading = false;
+        });
+      } else {
+        throw Exception("Failed to load products: ${response.statusCode}");
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error searching products: $e')));
+    }
+  }
+
+  void _searchProducts(String query) {
+    setState(() {
+      _searchQuery = query.isEmpty ? "All" : query;
+      _filteredProducts =
+          _products.where((product) {
+            final titleLower = product.title.toLowerCase();
+            final descriptionLower = product.description?.toLowerCase() ?? '';
+            final queryLower = query.toLowerCase();
+
+            return titleLower.contains(queryLower) ||
+                descriptionLower.contains(queryLower);
+          }).toList();
+    });
+  }
+
+  void _clearSearch() {
+    setState(() {
+      _searchController.clear();
+      _searchProducts("");
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,7 +105,11 @@ class _SearchScreenState extends State<SearchScreen> {
                         children: [
                           IconButton(
                             icon: Icon(Icons.search, size: 35),
-                            onPressed: () {},
+                            onPressed: () {
+                              if (_searchController.text.isNotEmpty) {
+                                _searchProducts(_searchController.text);
+                              }
+                            },
                           ),
                           Expanded(
                             child: TextField(
@@ -47,11 +121,12 @@ class _SearchScreenState extends State<SearchScreen> {
                                 ),
                                 border: InputBorder.none,
                               ),
+                              onSubmitted: _searchProducts,
                             ),
                           ),
                           IconButton(
                             icon: Icon(Icons.cancel, size: 35),
-                            onPressed: () {},
+                            onPressed: _clearSearch,
                           ),
                         ],
                       ),
@@ -67,7 +142,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 Padding(
                   padding: const EdgeInsets.only(top: 20, left: 20),
                   child: Text(
-                    'Results for "Shoes"',
+                    'Results for "$_searchQuery"',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -78,7 +153,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 Padding(
                   padding: const EdgeInsets.only(top: 20, right: 20),
                   child: Text(
-                    '6 Results Found',
+                    ' ${_filteredProducts.length} Results Found',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -98,10 +173,11 @@ class _SearchScreenState extends State<SearchScreen> {
                   crossAxisCount: 2,
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
-                  childAspectRatio: 0.75, 
+                  childAspectRatio: 0.75,
                 ),
-                itemCount: 6,
+                itemCount: _filteredProducts.length,
                 itemBuilder: (context, index) {
+                  final product = _filteredProducts[index];
                   return Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -113,7 +189,6 @@ class _SearchScreenState extends State<SearchScreen> {
                       children: [
                         Stack(
                           children: [
-                          
                             Container(
                               height: 150,
                               width: double.infinity,
@@ -122,14 +197,15 @@ class _SearchScreenState extends State<SearchScreen> {
                                   top: Radius.circular(10),
                                 ),
                                 image: DecorationImage(
-                                  image: AssetImage(
-                                    'assets/images/image1.jpeg',
-                                  ),
+                                  image: NetworkImage(product.image),
                                   fit: BoxFit.cover,
+                                  onError:
+                                      (exception, stackTrace) =>
+                                          Icon(Icons.error, size: 50),
                                 ),
                               ),
                             ),
-                            
+
                             Positioned(
                               top: 10,
                               right: 10,
@@ -140,10 +216,17 @@ class _SearchScreenState extends State<SearchScreen> {
                                 child: IconButton(
                                   icon: Icon(
                                     Icons.favorite_rounded,
-                                    color: Colors.white,
+                                    color:
+                                        product.isFavorite
+                                            ? Colors.red
+                                            : Colors.white,
                                     size: 25,
                                   ),
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    setState(() {
+                                      product.isFavorite = !product.isFavorite;
+                                    });
+                                  },
                                 ),
                               ),
                             ),
@@ -153,7 +236,9 @@ class _SearchScreenState extends State<SearchScreen> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: Text(
-                            'Shoe Name',
+                            product.title.length > 20
+                                ? '${product.title.substring(0, 20)}...'
+                                : product.title,
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -165,7 +250,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           child: Row(
                             children: [
                               Text(
-                                '\$50.00',
+                                '\$${product.price.toStringAsFixed(2)}',
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: Color(0xFF6055DB),
