@@ -7,7 +7,7 @@ https://github.com/tsega7659/GDG_group_5_Capstone_Project
 ## E-Commerce Clothing Store App
 
 ## Project Folder Structure
-
+##  you can add folders if needed
 
 1. lib/ - Main Application Folder
 
