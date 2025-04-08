@@ -1,12 +1,13 @@
+import 'package:e_commerce/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:your_app/core/theme/app_theme.dart';
+
 
 class CheckoutScreen extends StatelessWidget {
   const CheckoutScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final theme = AppTheme.of(context);
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(

@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-// Uncomment the one that applies for your navigation approach
-// import 'package:auto_route/auto_route.dart';
-// import 'package:your_app/routes/app_router.gr.dart';
- import 'checkout_screen.dart'; // If using basic navigation
 
 class CartItemModel {
   final String name;
@@ -51,11 +47,13 @@ class CartScreen extends StatelessWidget {
     double total = subtotal - discount + deliveryCharges;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F3F6),
+      backgroundColor: Color(0xFFF4F3F6),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF4F3F6),
+        backgroundColor:  Color(0xFFF4F3F6),
         elevation: 0,
-        title: const Text('Cart'),
+        title: const Text(
+          'Cart',
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.more_vert),
@@ -105,21 +103,226 @@ class CartScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(30.0),
                 ),
               ),
-              onPressed: () {
-                // Uncomment one of the options based on your setup
-
-                // Option 1: auto_route
-                // context.router.push(const CheckoutRoute());
-
-                // Option 2: basic Navigator
-                Navigator.push(context, MaterialPageRoute(
-                  builder: (_) => const CheckoutScreen()));
-              },
+              onPressed: () {},
               child: const Text(
-                'Proceed to Checkout',
+                'Check Out',
                 style: TextStyle(color: Colors.white),
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CartItem extends StatelessWidget {
+  const CartItem({Key? key, required this.cartItem}) : super(key: key);
+
+  final CartItemModel cartItem;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+      padding: const EdgeInsets.all(10.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 100,
+            height: 100,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15.0),
+              image: DecorationImage(
+                image: NetworkImage(cartItem.imageUrl),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          const SizedBox(width: 15),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  cartItem.name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                Text(
+                  cartItem.brand,
+                  style: const TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
+                ),
+                Text(
+                  '\$${cartItem.price}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF766893),
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.remove, color: Color(0xFF766893)),
+                            onPressed: () {},
+                          ),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Text(
+                            '02', // Quantity
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF766893),
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.add, color: Color(0xFF766893)),
+                            onPressed: () {},
+                          ),
+                        ),
+                      ],
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () {},
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class OrderSummary extends StatelessWidget {
+  const OrderSummary({
+    Key? key,
+    required this.totalItems,
+    required this.subtotal,
+    required this.discount,
+    required this.deliveryCharges,
+    required this.total,
+  }) : super(key: key);
+
+  final int totalItems;
+  final double subtotal;
+  final double discount;
+  final double deliveryCharges;
+  final double total;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20.0),
+      decoration: const BoxDecoration(
+        color: Color(0xFFF4F3F6),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Order Summary',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+          ),
+          const SizedBox(height: 15),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Items',
+                style: TextStyle(fontSize: 16),
+              ),
+              Text(
+                totalItems.toString(),
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Subtotal',
+                style: TextStyle(fontSize: 16),
+              ),
+              Text(
+                '\$${subtotal.toStringAsFixed(2)}',
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Discount',
+                style: TextStyle(fontSize: 16),
+              ),
+              Text(
+                '\$${discount.toStringAsFixed(2)}',
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Delivery Charges',
+                style: TextStyle(fontSize: 16),
+              ),
+              Text(
+                '\$${deliveryCharges.toStringAsFixed(2)}',
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
+          const Divider(thickness: 1.5),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Total',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+              Text(
+                '\$${total.toStringAsFixed(2)}',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+            ],
           ),
         ],
       ),
