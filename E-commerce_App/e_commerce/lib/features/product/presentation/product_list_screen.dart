@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class ProductListScreen extends StatelessWidget {
-  const ProductListScreen({super.key});
+  final List<Map<String, dynamic>> products;
+
+  const ProductListScreen({super.key, required this.products});
 
   @override
   Widget build(BuildContext context) {
@@ -24,13 +26,16 @@ class ProductListScreen extends StatelessWidget {
           crossAxisSpacing: 16.0,
           mainAxisSpacing: 16.0,
         ),
-        itemCount: _products.length, // Placeholder data
+        itemCount: products.length,
         itemBuilder: (context, index) {
-          final product = _products[index];
+          final product = products[index];
           return ProductCard(
-            name: product['name']!,
-            price: product['price']!,
-            imageUrl: product['imageUrl']!,
+            name:
+                product['title'].length > 20
+                    ? '${product['title'].substring(0, 20)}...'
+                    : product['title'], // Use 'title' for product name
+            price: '\$${product['price']}', // Format price
+            imageUrl: product['image'], // Use 'image' for product image
           );
         },
       ),
@@ -69,10 +74,7 @@ class ProductCard extends StatelessWidget {
                     topLeft: Radius.circular(12.0),
                     topRight: Radius.circular(12.0),
                   ),
-                  child: Image.network(
-                    imageUrl,
-                    fit: BoxFit.cover,
-                  ),
+                  child: Image.network(imageUrl, fit: BoxFit.cover),
                 ),
               ),
               const SizedBox(height: 8.0),
@@ -86,10 +88,7 @@ class ProductCard extends StatelessWidget {
               const SizedBox(height: 4.0),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Text(
-                  price,
-                  style: const TextStyle(color: Colors.grey),
-                ),
+                child: Text(price, style: const TextStyle(color: Colors.grey)),
               ),
             ],
           ),
@@ -125,13 +124,3 @@ class ProductCard extends StatelessWidget {
     );
   }
 }
-
-// Placeholder product data
-final List<Map<String, String>> _products = [
-  {'name': 'Watch', 'price': '\$40', 'imageUrl': 'https://picsum.photos/200/200'},
-  {'name': 'Nike Shoes', 'price': '\$430', 'imageUrl': 'https://picsum.photos/201/200'},
-  {'name': 'Airpods', 'price': '\$333', 'imageUrl': 'https://picsum.photos/202/200'},
-  {'name': 'LG TV', 'price': '\$330', 'imageUrl': 'https://picsum.photos/203/200'},
-  {'name': 'Hoodie', 'price': '\$50', 'imageUrl': 'https://picsum.photos/204/200'},
-  {'name': 'Jacket', 'price': '\$400', 'imageUrl': 'https://picsum.photos/205/200'},
-];
