@@ -1,43 +1,58 @@
+import 'package:e_commerce/core/api/api_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../bloc/product_list_bloc.dart';
+import '../../../core/models/product_model.dart';
 
 class ProductListScreen extends StatelessWidget {
-  final List<Map<String, dynamic>> products;
-
-  const ProductListScreen({super.key, required this.products});
+  const ProductListScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
+    return BlocProvider(
+      create: (context) => ProductListBloc(apiService: ApiService())..add(LoadProductList()),
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          title: const Text('Products'),
+          centerTitle: true,
+        ),
+        body: BlocBuilder<ProductListBloc, ProductListState>(
+          builder: (context, state) {
+            if (state is ProductListLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is ProductListError) {
+              return Center(child: Text('Error: ${state.message}'));
+            } else if (state is ProductListLoaded) {
+              return GridView.builder(
+                padding: const EdgeInsets.all(16.0),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.7,
+                  crossAxisSpacing: 16.0,
+                  mainAxisSpacing: 16.0,
+                ),
+                itemCount: state.products.length,
+                itemBuilder: (context, index) {
+                  final product = state.products[index];
+                  return ProductCard(
+                    name: product.title.length > 20 ? '${product.title.substring(0, 20)}...' : product.title,
+                    price: '\$${product.price}',
+                    imageUrl: product.image,
+                  );
+                },
+              );
+            } else {
+              return const Center(child: Text('Unknown state'));
+            }
           },
         ),
-        title: const Text('Products'),
-        centerTitle: true,
-      ),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(16.0),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 0.7,
-          crossAxisSpacing: 16.0,
-          mainAxisSpacing: 16.0,
-        ),
-        itemCount: products.length,
-        itemBuilder: (context, index) {
-          final product = products[index];
-          return ProductCard(
-            name:
-                product['title'].length > 20
-                    ? '${product['title'].substring(0, 20)}...'
-                    : product['title'], // Use 'title' for product name
-            price: '\$${product['price']}', // Format price
-            imageUrl: product['image'], // Use 'image' for product image
-          );
-        },
       ),
     );
   }
@@ -49,11 +64,11 @@ class ProductCard extends StatelessWidget {
   final String imageUrl;
 
   const ProductCard({
-    super.key,
+    Key? key,
     required this.name,
     required this.price,
     required this.imageUrl,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
