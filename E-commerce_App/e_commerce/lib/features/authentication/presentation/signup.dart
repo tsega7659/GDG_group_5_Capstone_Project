@@ -1,4 +1,4 @@
-// lib/presentation/screens/signup_screen.dart
+
 
 import 'package:e_commerce/core/routing/routes.dart';
 import 'package:e_commerce/core/utils/validators.dart';
@@ -31,7 +31,7 @@ class _SignupScreenState extends State<SignupScreen> {
       backgroundColor: purple,
       body: Stack(
         children: [
-          // Purple curved header
+      
           ClipPath(
             clipper: _HeaderClipper(),
             child: Container(
@@ -40,7 +40,7 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
           ),
 
-          // White form card
+      
           Align(
             alignment: Alignment.bottomCenter,
             child: SingleChildScrollView(
@@ -56,7 +56,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Title
+                  
                     Text(
                       'Sign Up',
                       textAlign: TextAlign.center,
@@ -68,12 +68,12 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                    // Form
+                    
                     Form(
                       key: _formKey,
                       child: Column(
                         children: [
-                          // User Name
+                         
                           TextFormField(
                             controller: _nameCtrl,
                             decoration: const InputDecoration(
@@ -88,7 +88,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           ),
                           const SizedBox(height: 20),
 
-                          // Email
+                         
                           TextFormField(
                             controller: _emailCtrl,
                             decoration: const InputDecoration(
@@ -100,7 +100,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           ),
                           const SizedBox(height: 20),
 
-                          // Password
+                          
                           TextFormField(
                             controller: _passCtrl,
                             obscureText: _obscure,
@@ -123,7 +123,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                     const SizedBox(height: 32),
 
-                    // Sign Up button
+                   
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: purple,
@@ -150,7 +150,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                     const SizedBox(height: 16),
 
-                    // Log in link
+                   
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -174,7 +174,7 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
           ),
 
-          // Loading indicator
+          
           BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state) {
               if (state is AuthLoading) {
@@ -189,7 +189,7 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 }
 
-// Reuse the same header clipper
+
 class _HeaderClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
