@@ -1,4 +1,4 @@
-// lib/presentation/screens/login_screen.dart
+
 
 import 'package:e_commerce/core/routing/routes.dart';
 import 'package:e_commerce/core/utils/validators.dart';
@@ -29,7 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: purple,
       body: Stack(
         children: [
-          // 1️⃣ Purple curved header
+          
           ClipPath(
             clipper: _HeaderClipper(),
             child: Container(
@@ -38,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // 2️⃣ White form card
+          
           Align(
             alignment: Alignment.bottomCenter,
             child: SingleChildScrollView(
@@ -54,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Title
+                    
                     Text(
                       'Login',
                       textAlign: TextAlign.center,
@@ -71,19 +71,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       key: _formKey,
                       child: Column(
                         children: [
-                          // Email
+                          
                           TextFormField(
                             controller: _emailCtrl,
                             decoration: const InputDecoration(
                               prefixIcon: Icon(Icons.person),
-                              hintText: 'User Name',
+                              hintText: 'Email',
                               border: UnderlineInputBorder(),
                             ),
                             validator: Validators.validateEmail,
                           ),
                           const SizedBox(height: 20),
 
-                          // Password
+                          
                           TextFormField(
                             controller: _passCtrl,
                             obscureText: _obscure,
@@ -110,7 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 32),
 
-                    // Login button
+                    
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: purple,
@@ -137,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 16),
 
-                    // Sign up link
+                  
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -161,7 +161,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // 3️⃣ Optional: Loading indicator on top
+          
           BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state) {
               if (state is AuthLoading) {
@@ -176,19 +176,19 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-/// Clips the top container into a downward curve.
+
 class _HeaderClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
-    // Start at top-left
+  
     path.lineTo(0, size.height - 60);
-    // Curve to top-right
+    
     path.quadraticBezierTo(
       size.width / 2, size.height,
       size.width, size.height - 60,
     );
-    // Up to top-right
+    
     path.lineTo(size.width, 0);
     path.close();
     return path;
