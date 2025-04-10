@@ -1,10 +1,10 @@
-import 'dart:convert';
 import 'package:e_commerce/features/product/presentation/product_list_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import '../../../core/api/api_service.dart';
+import '../../../core/models/product_model.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -12,8 +12,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
-  List<dynamic> _products = []; // All products
-  List<dynamic> _filteredProducts = []; // Filtered products for search
+  List<Product> _products = []; // All products
+  List<Product> _filteredProducts = []; // Filtered products for search
   bool isLoading = false;
 
   @override
@@ -22,57 +22,25 @@ class _HomeScreenState extends State<HomeScreen> {
     _fetchProducts();
   }
 
+  ApiService apiService = ApiService();
   Future<void> _fetchProducts() async {
     setState(() {
       isLoading = true;
     });
 
     try {
-      final url = Uri.parse("https://fakestoreapi.com/products");
-      final response = await http.get(url);
-
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        setState(() {
-          _products = data;
-          _filteredProducts = _products; // Initially show all products
-          isLoading = false;
-        });
-      } else {
-        throw Exception('Failed to load products');
-      }
+      List<Product> products = await apiService.getProducts();
+      setState(() {
+        _products = products;
+        _filteredProducts = _products; // Initially show all products
+        isLoading = false;
+      });
     } catch (e) {
       setState(() {
         isLoading = false;
       });
       print('Error: $e');
     }
-  }
-
-  void _searchProducts(String query) {
-    final searchResults =
-        _products
-            .where(
-              (product) =>
-                  product['title'].toLowerCase().contains(query.toLowerCase()),
-            )
-            .toList();
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder:
-            (context) => ProductListScreen(
-              products: searchResults.cast<Map<String, dynamic>>(),
-            ),
-      ),
-    );
-  }
-
-  void _clearSearch() {
-    setState(() {
-      _searchController.clear();
-    });
   }
 
   @override
@@ -134,7 +102,6 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // App Bar Section (Profile, Greeting, Notification)
             Padding(
               padding: const EdgeInsets.only(top: 30, left: 20, right: 20),
               child: Row(
@@ -151,11 +118,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           IconButton(
                             icon: Icon(Icons.search, size: 35),
                             onPressed: () {
-                              if (_searchController.text.isNotEmpty) {
-                                _searchProducts(
-                                  _searchController.text,
-                                ); // Navigate to ProductListScreen
-                              }
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ProductListScreen(),
+                                ),
+                              );
                             },
                           ),
                           Expanded(
@@ -169,13 +137,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 border: InputBorder.none,
                               ),
-                              onSubmitted:
-                                  _searchProducts, // Optional: Trigger search on "Enter"
                             ),
                           ),
                           IconButton(
                             icon: Icon(Icons.cancel, size: 35),
-                            onPressed: _clearSearch, // Clear the input text
+                            onPressed: () {
+                              setState(() {
+                                _searchController.clear();
+                              });
+                            },
                           ),
                         ],
                       ),
@@ -184,7 +154,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            // Banner Carousel Section
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: SizedBox(
@@ -244,7 +213,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-            // Featured Products Section
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 16.0,
@@ -265,7 +233,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       TextButton(
                         onPressed: () {
-                          // TODO: Implement see all action
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProductListScreen(),
+                            ),
+                          );
                         },
                         child: const Text(
                           'See All',
@@ -279,22 +252,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: 250.0,
                     child: ListView(
                       scrollDirection: Axis.horizontal,
-                      children:
-                          _products.map((product) {
-                            return _buildProductCard(
-                              product['title'].length > 20
-                                  ? '${product['title'].substring(0, 20)}...'
-                                  : product['title'], // Access the title using the map key
-                              '\$${product['price']}', // Access the price using the map key
-                              product['image'], // Access the image using the map key
-                            );
-                          }).toList(),
+                      children: _products.map((product) {
+                        return _buildProductCard(
+                          product.title.length > 20
+                              ? '${product.title.substring(0, 20)}...'
+                              : product.title,
+                          '\$${product.price}',
+                          product.image,
+                        );
+                      }).toList(),
                     ),
                   ),
                 ],
               ),
             ),
-            // Most Popular Products Section
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 16.0,
@@ -315,7 +286,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       TextButton(
                         onPressed: () {
-                          // TODO: Implement see all action
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProductListScreen(),
+                            ),
+                          );
                         },
                         child: const Text(
                           'See All',
@@ -329,14 +305,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: 250.0,
                     child: ListView(
                       scrollDirection: Axis.horizontal,
-                      children:
-                          _products.map((product) {
-                            return _buildProductCard(
-                              product['title'], // Access the title using the map key
-                              '\$${product['price']}', // Access the price using the map key
-                              product['image'], // Access the image using the map key
-                            );
-                          }).toList(),
+                      children: _products.map((product) {
+                        return _buildProductCard(
+                          product.title,
+                          '\$${product.price}',
+                          product.image,
+                        );
+                      }).toList(),
                     ),
                   ),
                   const SizedBox(height: 16.0),
