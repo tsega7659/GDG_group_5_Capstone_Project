@@ -1,5 +1,3 @@
-
-
 import 'package:e_commerce/core/routing/routes.dart';
 import 'package:e_commerce/core/utils/validators.dart';
 import 'package:e_commerce/features/authentication/bloc/auth_bloc.dart';
@@ -8,20 +6,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:e_commerce/features/authentication/bloc/auth_event.dart';
 
-
-
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
+
   @override
   State<SignupScreen> createState() => _SignupScreenState();
 }
 
 class _SignupScreenState extends State<SignupScreen> {
-  final _formKey    = GlobalKey<FormState>();
-  final _nameCtrl   = TextEditingController();
-  final _emailCtrl  = TextEditingController();
-  final _passCtrl   = TextEditingController();
-  bool  _obscure    = true;
+  final _formKey = GlobalKey<FormState>();
+  final _nameCtrl = TextEditingController();
+  final _emailCtrl = TextEditingController();
+  final _passCtrl = TextEditingController();
+  bool _obscure = true;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +28,6 @@ class _SignupScreenState extends State<SignupScreen> {
       backgroundColor: purple,
       body: Stack(
         children: [
-      
           ClipPath(
             clipper: _HeaderClipper(),
             child: Container(
@@ -39,8 +35,6 @@ class _SignupScreenState extends State<SignupScreen> {
               color: purple,
             ),
           ),
-
-      
           Align(
             alignment: Alignment.bottomCenter,
             child: SingleChildScrollView(
@@ -56,7 +50,6 @@ class _SignupScreenState extends State<SignupScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                  
                     Text(
                       'Sign Up',
                       textAlign: TextAlign.center,
@@ -67,13 +60,10 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                     ),
                     const SizedBox(height: 24),
-
-                    
                     Form(
                       key: _formKey,
                       child: Column(
                         children: [
-                         
                           TextFormField(
                             controller: _nameCtrl,
                             decoration: const InputDecoration(
@@ -87,8 +77,6 @@ class _SignupScreenState extends State<SignupScreen> {
                             },
                           ),
                           const SizedBox(height: 20),
-
-                         
                           TextFormField(
                             controller: _emailCtrl,
                             decoration: const InputDecoration(
@@ -99,8 +87,6 @@ class _SignupScreenState extends State<SignupScreen> {
                             validator: Validators.validateEmail,
                           ),
                           const SizedBox(height: 20),
-
-                          
                           TextFormField(
                             controller: _passCtrl,
                             obscureText: _obscure,
@@ -120,44 +106,45 @@ class _SignupScreenState extends State<SignupScreen> {
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 32),
-
-                   
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: purple,
-                        minimumSize: const Size.fromHeight(50),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          context.read<AuthBloc>().add(
-                            SignUpRequested(
-                              email:    _emailCtrl.text.trim(),
-                              password: _passCtrl.text.trim(),
+                    BlocBuilder<AuthBloc, AuthState>(
+                      builder: (context, state) {
+                        return ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: purple,
+                            minimumSize: const Size.fromHeight(50),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
                             ),
-                          );
-                        }
+                          ),
+                          onPressed: state is AuthLoading
+                              ? null
+                              : () {
+                                  if (_formKey.currentState!.validate()) {
+                                    context.read<AuthBloc>().add(
+                                          SignUpRequested(
+                                            email: _emailCtrl.text.trim(),
+                                            password: _passCtrl.text.trim(),
+                                          ),
+                                        );
+                                  }
+                                },
+                          child: state is AuthLoading
+                              ? const CircularProgressIndicator(color: Colors.white)
+                              : const Text(
+                                  'Sign Up',
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                        );
                       },
-                      child: const Text(
-                        'Sign Up',
-                        style: TextStyle(fontSize: 18),
-                      ),
                     ),
-
                     const SizedBox(height: 16),
-
-                   
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Text("Already have an account? "),
                         GestureDetector(
-                          onTap: () =>
-                              Navigator.pushReplacementNamed(context, AppRoutes.login),
+                          onTap: () => Navigator.pushReplacementNamed(context, AppRoutes.login),
                           child: Text(
                             'Log in',
                             style: TextStyle(
@@ -173,12 +160,26 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
             ),
           ),
-
-          
           BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state) {
               if (state is AuthLoading) {
-                return const Center(child: CircularProgressIndicator());
+                return Container(
+                  color: Colors.black.withOpacity(0.5),
+                  child: const Center(child: CircularProgressIndicator()),
+                );
+              } else if (state is AuthFailure) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(state.error),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                });
+              } else if (state is AuthAuthenticated) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  Navigator.pushReplacementNamed(context, AppRoutes.login); // Ensure this is login
+                });
               }
               return const SizedBox.shrink();
             },
@@ -187,8 +188,15 @@ class _SignupScreenState extends State<SignupScreen> {
       ),
     );
   }
-}
 
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    _emailCtrl.dispose();
+    _passCtrl.dispose();
+    super.dispose();
+  }
+}
 
 class _HeaderClipper extends CustomClipper<Path> {
   @override
@@ -196,13 +204,16 @@ class _HeaderClipper extends CustomClipper<Path> {
     final path = Path();
     path.lineTo(0, size.height - 60);
     path.quadraticBezierTo(
-      size.width / 2, size.height,
-      size.width, size.height - 60,
+      size.width / 2,
+      size.height,
+      size.width,
+      size.height - 60,
     );
     path.lineTo(size.width, 0);
     path.close();
     return path;
   }
+
   @override
   bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }

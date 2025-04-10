@@ -1,4 +1,4 @@
-/// Defines the structure of a User model.
+
 class User {
   final String id;
   final String name;
