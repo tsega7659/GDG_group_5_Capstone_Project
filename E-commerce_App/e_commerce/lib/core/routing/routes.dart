@@ -40,6 +40,8 @@ class _BottomNavBarState extends State<BottomNavBar>
     const SearchScreen(),
     CartScreen(),
     const ProfileScreen(),
+    const SignupScreen(),
+  const LoginScreen(),
   ];
 
   @override
@@ -233,5 +235,3 @@ class _BottomNavBarState extends State<BottomNavBar>
     );
   }
 }
-
-
