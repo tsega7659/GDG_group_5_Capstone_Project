@@ -11,7 +11,9 @@ class ProductListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ProductListBloc(apiService: ApiService())..add(LoadProductList()),
+      create:
+          (context) =>
+              ProductListBloc(apiService: ApiService())..add(LoadProductList()),
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
@@ -42,7 +44,10 @@ class ProductListScreen extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final product = state.products[index];
                   return ProductCard(
-                    name: product.title.length > 20 ? '${product.title.substring(0, 20)}...' : product.title,
+                    name:
+                        product.title.length > 20
+                            ? '${product.title.substring(0, 20)}...'
+                            : product.title,
                     price: '\$${product.price}',
                     imageUrl: product.image,
                   );
