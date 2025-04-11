@@ -1,3 +1,4 @@
+import 'package:e_commerce/features/product/presentation/product_detail_screen.dart';
 import 'package:e_commerce/features/product/presentation/product_list_screen.dart';
 import 'package:flutter/material.dart';
 import '../../../core/api/api_service.dart';
@@ -252,15 +253,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: 250.0,
                     child: ListView(
                       scrollDirection: Axis.horizontal,
-                      children: _products.map((product) {
-                        return _buildProductCard(
-                          product.title.length > 20
-                              ? '${product.title.substring(0, 20)}...'
-                              : product.title,
-                          '\$${product.price}',
-                          product.image,
-                        );
-                      }).toList(),
+                      children:
+                          _products.map((product) {
+                            return _buildProductCard(
+                              product.title,
+                              '\$${product.price}',
+                              product.image,
+                              product, // Pass the product object
+                            );
+                          }).toList(),
                     ),
                   ),
                 ],
@@ -305,13 +306,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: 250.0,
                     child: ListView(
                       scrollDirection: Axis.horizontal,
-                      children: _products.map((product) {
-                        return _buildProductCard(
-                          product.title,
-                          '\$${product.price}',
-                          product.image,
-                        );
-                      }).toList(),
+                      children:
+                          _products.map((product) {
+                            return _buildProductCard(
+                              product.title.length > 20
+                                  ? '${product.title.substring(0, 20)}...'
+                                  : product.title,
+                              '\$${product.price}',
+                              product.image,
+                              product, // Pass the product object
+                            );
+                          }).toList(),
                     ),
                   ),
                   const SizedBox(height: 16.0),
@@ -324,50 +329,68 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildProductCard(String name, String price, String imageUrl) {
-    return Container(
-      width: 180.0,
-      margin: const EdgeInsets.symmetric(horizontal: 8.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12.0),
-        color: Colors.grey[200],
-      ),
-      child: Stack(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AspectRatio(
-                aspectRatio: 1.0,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(12.0),
-                    topRight: Radius.circular(12.0),
+  Widget _buildProductCard(
+    String name,
+    String price,
+    String imageUrl,
+    Product product,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductDetailScreen(product: product),
+          ),
+        );
+      },
+      child: Container(
+        width: 180.0,
+        margin: const EdgeInsets.symmetric(horizontal: 8.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12.0),
+          color: Colors.grey[200],
+        ),
+        child: Stack(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AspectRatio(
+                  aspectRatio: 1.0,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(12.0),
+                      topRight: Radius.circular(12.0),
+                    ),
+                    child: Image.network(imageUrl, fit: BoxFit.cover),
                   ),
-                  child: Image.network(imageUrl, fit: BoxFit.cover),
                 ),
-              ),
-              const SizedBox(height: 8.0),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Text(
-                  name,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                const SizedBox(height: 8.0),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Text(
+                    name,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4.0),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Text(price, style: const TextStyle(color: Colors.grey)),
-              ),
-            ],
-          ),
-          const Positioned(
-            top: 8.0,
-            right: 8.0,
-            child: Icon(Icons.favorite_border, color: Colors.white),
-          ),
-        ],
+                const SizedBox(height: 4.0),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Text(
+                    price,
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                ),
+              ],
+            ),
+            const Positioned(
+              top: 8.0,
+              right: 8.0,
+              child: Icon(Icons.favorite_border, color: Colors.white),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,92 +1,78 @@
+import 'package:e_commerce/features/product/presentation/product_list_screen.dart';
 import 'package:flutter/material.dart';
+import '../../../core/models/product_model.dart';
+import 'checkout_screen.dart';
 
-class CartItemModel {
-  final String name;
-  final String brand;
-  final double price;
-  final String imageUrl;
+class CartScreen extends StatefulWidget {
+  final List<Product> selectedProducts;
 
-  CartItemModel({
-    required this.name,
-    required this.brand,
-    required this.price,
-    required this.imageUrl,
-  });
+  CartScreen({Key? key, required this.selectedProducts}) : super(key: key);
+
+  @override
+  State<CartScreen> createState() => _CartScreenState();
 }
 
-class CartScreen extends StatelessWidget {
-  CartScreen({Key? key}) : super(key: key);
+class _CartScreenState extends State<CartScreen> {
+  List<Product> cartProducts = [];
 
-  final List<CartItemModel> cartItems = [
-    CartItemModel(
-      name: 'Watch',
-      brand: 'Rolex',
-      price: 40,
-      imageUrl: 'https://i.imgur.com/824kxAo.jpg',
-    ),
-    CartItemModel(
-      name: 'Airpods',
-      brand: 'Apple',
-      price: 333,
-      imageUrl: 'https://i.imgur.com/824kxAo.jpg',
-    ),
-    CartItemModel(
-      name: 'Hoodie',
-      brand: 'Puma',
-      price: 50,
-      imageUrl: 'https://i.imgur.com/824kxAo.jpg',
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    cartProducts = widget.selectedProducts;
+  }
+
+  void addProduct(Product product) {
+    setState(() {
+      cartProducts.add(product);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    int totalItems = cartItems.length;
-    double subtotal = cartItems.fold(0, (sum, item) => sum + item.price);
+    double subtotal = cartProducts.fold(0, (sum, item) => sum + item.price);
     double discount = 4;
     double deliveryCharges = 2;
     double total = subtotal - discount + deliveryCharges;
 
     return Scaffold(
-      backgroundColor: Color(0xFFF4F3F6),
+      backgroundColor: const Color(0xFFF4F3F6),
       appBar: AppBar(
-        backgroundColor:  Color(0xFFF4F3F6),
+        backgroundColor: const Color(0xFFF4F3F6),
         elevation: 0,
-        title: const Text(
-          'Cart',
+        title: const Text('Cart', style: TextStyle(color: Colors.black)),
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.more_vert),
+            icon: const Icon(Icons.more_vert, color: Colors.black),
             onPressed: () {},
           ),
         ],
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {},
-        ),
       ),
       body: Column(
         children: [
           Expanded(
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Color(0xFFF4F3F6),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30.0),
-                  topRight: Radius.circular(30.0),
-                ),
-              ),
-              child: ListView.builder(
-                itemCount: cartItems.length,
-                padding: const EdgeInsets.only(top: 20.0),
-                itemBuilder: (context, index) {
-                  return CartItem(cartItem: cartItems[index]);
-                },
-              ),
+            child: ListView.builder(
+              itemCount: cartProducts.length,
+              itemBuilder: (context, index) {
+                final product = cartProducts[index];
+                return CartItem(
+                  cartItem: CartItemModel(
+                    name: product.title,
+                    brand:
+                        "Brand Name", // Replace with actual brand if available
+                    price: product.price,
+                    imageUrl: product.image,
+                  ),
+                );
+              },
             ),
           ),
           OrderSummary(
-            totalItems: totalItems,
+            totalItems: cartProducts.length,
             subtotal: subtotal,
             discount: discount,
             deliveryCharges: deliveryCharges,
@@ -96,14 +82,60 @@ class CartScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF766893),
-                padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                backgroundColor: const Color(0xFF6055DB),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 50,
+                  vertical: 15,
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30.0),
                 ),
               ),
-              onPressed: () {},
+              onPressed: () async {
+                final newProduct = await Navigator.push<Product>(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProductListScreen()),
+                );
+                if (newProduct != null) {
+                  addProduct(newProduct);
+                }
+              },
+              child: const Text(
+                'Add Product',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF6055DB),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 50,
+                  vertical: 15,
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                ),
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (context) => CheckoutScreen(cartProducts: cartProducts),
+                  ),
+                );
+              },
               child: const Text(
                 'Check Out',
                 style: TextStyle(color: Colors.white),
@@ -157,10 +189,7 @@ class CartItem extends StatelessWidget {
                 ),
                 Text(
                   cartItem.brand,
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 14,
-                  ),
+                  style: const TextStyle(color: Colors.grey, fontSize: 14),
                 ),
                 Text(
                   '\$${cartItem.price}',
@@ -176,11 +205,11 @@ class CartItem extends StatelessWidget {
                       children: [
                         Container(
                           decoration: BoxDecoration(
-                            color: const Color(0xFF766893),
+                            color: const Color(0xFF6055DB),
                             borderRadius: BorderRadius.circular(20.0),
                           ),
                           child: IconButton(
-                            icon: const Icon(Icons.remove, color: Color(0xFF766893)),
+                            icon: const Icon(Icons.remove, color: Colors.white),
                             onPressed: () {},
                           ),
                         ),
@@ -193,11 +222,11 @@ class CartItem extends StatelessWidget {
                         ),
                         Container(
                           decoration: BoxDecoration(
-                            color: const Color(0xFF766893),
+                            color: const Color(0xFF6055DB),
                             borderRadius: BorderRadius.circular(20.0),
                           ),
                           child: IconButton(
-                            icon: const Icon(Icons.add, color: Color(0xFF766893)),
+                            icon: const Icon(Icons.add, color: Colors.white),
                             onPressed: () {},
                           ),
                         ),
@@ -216,6 +245,20 @@ class CartItem extends StatelessWidget {
       ),
     );
   }
+}
+
+class CartItemModel {
+  final String name;
+  final String brand;
+  final double price;
+  final String imageUrl;
+
+  CartItemModel({
+    required this.name,
+    required this.brand,
+    required this.price,
+    required this.imageUrl,
+  });
 }
 
 class OrderSummary extends StatelessWidget {
@@ -239,68 +282,54 @@ class OrderSummary extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20.0),
       decoration: const BoxDecoration(
-        color: Color(0xFFF4F3F6),
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20.0),
+          topRight: Radius.circular(20.0),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
             'Order Summary',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-            ),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
           ),
           const SizedBox(height: 15),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Items',
-                style: TextStyle(fontSize: 16),
-              ),
-              Text(
-                totalItems.toString(),
-                style: TextStyle(fontSize: 16),
-              ),
+              const Text('Items', style: TextStyle(fontSize: 16)),
+              Text(totalItems.toString(), style: const TextStyle(fontSize: 16)),
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Subtotal',
-                style: TextStyle(fontSize: 16),
-              ),
+              const Text('Subtotal', style: TextStyle(fontSize: 16)),
               Text(
                 '\$${subtotal.toStringAsFixed(2)}',
-                style: TextStyle(fontSize: 16),
+                style: const TextStyle(fontSize: 16),
               ),
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Discount',
-                style: TextStyle(fontSize: 16),
-              ),
+              const Text('Discount', style: TextStyle(fontSize: 16)),
               Text(
                 '\$${discount.toStringAsFixed(2)}',
-                style: TextStyle(fontSize: 16),
+                style: const TextStyle(fontSize: 16),
               ),
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Delivery Charges',
-                style: TextStyle(fontSize: 16),
-              ),
+              const Text('Delivery Charges', style: TextStyle(fontSize: 16)),
               Text(
                 '\$${deliveryCharges.toStringAsFixed(2)}',
-                style: TextStyle(fontSize: 16),
+                style: const TextStyle(fontSize: 16),
               ),
             ],
           ),
@@ -310,14 +339,11 @@ class OrderSummary extends StatelessWidget {
             children: [
               const Text(
                 'Total',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
               Text(
                 '\$${total.toStringAsFixed(2)}',
-                style: TextStyle(
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),

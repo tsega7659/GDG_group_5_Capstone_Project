@@ -12,9 +12,8 @@ class ProductListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create:
-          (context) =>
-              ProductListBloc(apiService: ApiService())..add(LoadProductList()),
+      create: (context) =>
+          ProductListBloc(apiService: ApiService())..add(LoadProductList()),
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
@@ -42,7 +41,7 @@ class ProductListScreen extends StatelessWidget {
                   mainAxisSpacing: 16.0,
                 ),
                 itemCount: state.products.length,
-                  itemBuilder: (context, index) {
+                itemBuilder: (context, index) {
                   final product = state.products[index];
                   return ProductCard(
                     name: product.title.length > 20
@@ -50,7 +49,7 @@ class ProductListScreen extends StatelessWidget {
                         : product.title,
                     price: '\$${product.price}',
                     imageUrl: product.image,
-                    product: product, // Add this line
+                    product: product, // Pass the product object
                   );
                 },
               );
@@ -140,7 +139,7 @@ class ProductCard extends StatelessWidget {
               right: 8.0,
               child: InkWell(
                 onTap: () {
-                  // TODO: Implement add to cart action
+                  Navigator.pop(context, product); // Return the selected product
                 },
                 child: Container(
                   padding: const EdgeInsets.all(8.0),

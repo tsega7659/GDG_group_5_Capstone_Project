@@ -1,13 +1,18 @@
-import 'package:e_commerce/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
-
+import '../../../core/models/product_model.dart';
+import 'orders_history_screen.dart';
 
 class CheckoutScreen extends StatelessWidget {
-  const CheckoutScreen({super.key});
+  final List<Product> cartProducts;
+
+  const CheckoutScreen({super.key, required this.cartProducts});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    double subtotal = cartProducts.fold(0, (sum, item) => sum + item.price);
+    double discount = 4;
+    double deliveryCharges = 2;
+    double total = subtotal - discount + deliveryCharges;
 
     return Scaffold(
       appBar: AppBar(
@@ -25,7 +30,12 @@ class CheckoutScreen extends StatelessWidget {
           children: [
             _buildDeliveryInfoSection(),
             const SizedBox(height: 24),
-            _buildOrderSummarySection(theme),
+            _buildOrderSummarySection(
+              subtotal,
+              discount,
+              deliveryCharges,
+              total,
+            ),
             const SizedBox(height: 24),
             _buildPaymentMethodsSection(),
             const SizedBox(height: 24),
@@ -66,10 +76,15 @@ class CheckoutScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildOrderSummarySection(ThemeData theme) {
+  Widget _buildOrderSummarySection(
+    double subtotal,
+    double discount,
+    double deliveryCharges,
+    double total,
+  ) {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: theme.dividerColor),
+        border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(8),
       ),
       padding: const EdgeInsets.all(16),
@@ -83,12 +98,19 @@ class CheckoutScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          _buildOrderRow('Items', '3'),
-          _buildOrderRow('Subtotal', '\$423'),
-          _buildOrderRow('Discount', '\$4'),
-          _buildOrderRow('Delivery Charges', '\$2'),
+          _buildOrderRow('Items', cartProducts.length.toString()),
+          _buildOrderRow('Subtotal', '\$${subtotal.toStringAsFixed(2)}'),
+          _buildOrderRow('Discount', '\$${discount.toStringAsFixed(2)}'),
+          _buildOrderRow(
+            'Delivery Charges',
+            '\$${deliveryCharges.toStringAsFixed(2)}',
+          ),
           const Divider(height: 24),
-          _buildOrderRow('Total', '\$423', isBold: true),
+          _buildOrderRow(
+            'Total',
+            '\$${total.toStringAsFixed(2)}',
+            isBold: true,
+          ),
         ],
       ),
     );
@@ -149,8 +171,11 @@ class CheckoutScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPaymentMethodOption(String title, IconData icon,
-      {bool isSelected = false}) {
+  Widget _buildPaymentMethodOption(
+    String title,
+    IconData icon, {
+    bool isSelected = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -167,9 +192,10 @@ class CheckoutScreen extends StatelessWidget {
               border: Border.all(color: Colors.grey),
               color: isSelected ? Colors.blue : null,
             ),
-            child: isSelected
-                ? const Icon(Icons.check, size: 16, color: Colors.white)
-                : null,
+            child:
+                isSelected
+                    ? const Icon(Icons.check, size: 16, color: Colors.white)
+                    : null,
           ),
         ],
       ),
@@ -185,7 +211,12 @@ class CheckoutScreen extends StatelessWidget {
           backgroundColor: Theme.of(context).primaryColor,
         ),
         onPressed: () {
-          // Handle checkout
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OrdersHistoryScreen(orders: cartProducts),
+            ),
+          );
         },
         child: const Text(
           'Check Out',

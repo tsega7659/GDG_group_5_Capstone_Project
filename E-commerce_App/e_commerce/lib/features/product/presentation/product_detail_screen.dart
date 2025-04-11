@@ -1,3 +1,4 @@
+import 'package:e_commerce/features/cart/presentation/cart_screen.dart';
 import 'package:flutter/material.dart';
 import '../../../core/models/product_model.dart';
 
@@ -112,11 +113,18 @@ class ProductDetailScreen extends StatelessWidget {
               const SizedBox(height: 32),
 
               // Buy Now Button
-              SizedBox(
+               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    // TODO: Implement buy now action
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CartScreen(
+                          selectedProducts: [product], // Pass the product to CartScreen
+                        ),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepPurple,
@@ -125,7 +133,7 @@ class ProductDetailScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text(
+                   child: const Text(
                     'Buy Now',
                     style: TextStyle(
                       fontSize: 18,
