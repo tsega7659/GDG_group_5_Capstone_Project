@@ -29,15 +29,18 @@ class _LoginScreenState extends State<LoginScreen> {
         children: [
           ClipPath(
             clipper: _HeaderClipper(),
-            child: Container(height: 250, color: purple),
+            child: Container(height: 200, color: purple),
           ),
           Align(
             alignment: Alignment.bottomCenter,
             child: SingleChildScrollView(
-              padding: const EdgeInsets.only(top: 150),
+              padding: const EdgeInsets.only(top: 0),
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 32,
+                ),
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
@@ -63,7 +66,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           TextFormField(
                             controller: _emailCtrl,
                             decoration: const InputDecoration(
-                              prefixIcon: Icon(Icons.email), // Fixed icon to match field
+                              prefixIcon: Icon(
+                                Icons.email,
+                              ), // Fixed icon to match field
                               hintText: 'Email',
                               border: UnderlineInputBorder(),
                             ),
@@ -79,9 +84,12 @@ class _LoginScreenState extends State<LoginScreen> {
                               border: const UnderlineInputBorder(),
                               suffixIcon: IconButton(
                                 icon: Icon(
-                                  _obscure ? Icons.visibility_off : Icons.visibility,
+                                  _obscure
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
                                 ),
-                                onPressed: () => setState(() => _obscure = !_obscure),
+                                onPressed:
+                                    () => setState(() => _obscure = !_obscure),
                               ),
                             ),
                             validator: Validators.validatePassword,
@@ -100,24 +108,31 @@ class _LoginScreenState extends State<LoginScreen> {
                               borderRadius: BorderRadius.circular(30),
                             ),
                           ),
-                          onPressed: state is AuthLoading
-                              ? null // Disable button during loading
-                              : () {
-                                  if (_formKey.currentState!.validate()) {
-                                    context.read<AuthBloc>().add(
-                                          LoginRequested(
-                                            email: _emailCtrl.text.trim(),
-                                            password: _passCtrl.text.trim(),
-                                          ),
-                                        );
-                                  }
-                                },
-                          child: state is AuthLoading
-                              ? const CircularProgressIndicator(color: Colors.white)
-                              : const Text(
-                                  'Login',
-                                  style: TextStyle(fontSize: 18, color: Colors.white),
-                                ),
+                          onPressed:
+                              state is AuthLoading
+                                  ? null // Disable button during loading
+                                  : () {
+                                    if (_formKey.currentState!.validate()) {
+                                      context.read<AuthBloc>().add(
+                                        LoginRequested(
+                                          email: _emailCtrl.text.trim(),
+                                          password: _passCtrl.text.trim(),
+                                        ),
+                                      );
+                                    }
+                                  },
+                          child:
+                              state is AuthLoading
+                                  ? const CircularProgressIndicator(
+                                    color: Colors.white,
+                                  )
+                                  : const Text(
+                                    'Login',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                         );
                       },
                     ),
@@ -125,13 +140,24 @@ class _LoginScreenState extends State<LoginScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text("Don't have an account? "),
+                        const Text(
+                          "Don't have an account? ",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
                         GestureDetector(
-                          onTap: () => Navigator.pushNamed(context, AppRoutes.signup),
+                          onTap:
+                              () => Navigator.pushNamed(
+                                context,
+                                AppRoutes.signup,
+                              ),
                           child: Text(
                             'Sign up',
                             style: TextStyle(
                               color: purple,
+                              fontSize: 20,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -161,7 +187,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 });
               } else if (state is AuthAuthenticated) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  Navigator.pushReplacementNamed(context, AppRoutes.home); // Redirect to home
+                  Navigator.pushReplacementNamed(
+                    context,
+                    AppRoutes.home,
+                  ); // Redirect to home
                 });
               }
               return const SizedBox.shrink();

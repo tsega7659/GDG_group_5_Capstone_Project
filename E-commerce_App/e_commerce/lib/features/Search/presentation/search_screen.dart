@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:e_commerce/core/models/product_model.dart';
+import 'package:e_commerce/features/product/presentation/product_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -178,103 +179,126 @@ class _SearchScreenState extends State<SearchScreen> {
                 itemCount: _filteredProducts.length,
                 itemBuilder: (context, index) {
                   final product = _filteredProducts[index];
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.grey[300]!),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Stack(
-                          children: [
-                            Container(
-                              height: 150,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(10),
-                                ),
-                                image: DecorationImage(
-                                  image: NetworkImage(product.image),
-                                  fit: BoxFit.cover,
-                                  onError:
-                                      (exception, stackTrace) =>
-                                          Icon(Icons.error, size: 50),
-                                ),
-                              ),
-                            ),
-
-                            Positioned(
-                              top: 10,
-                              right: 10,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                ),
-                                child: IconButton(
-                                  icon: Icon(
-                                    Icons.favorite_rounded,
-                                    color:
-                                        product.isFavorite
-                                            ? Colors.red
-                                            : Colors.white,
-                                    size: 25,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      product.isFavorite = !product.isFavorite;
-                                    });
-                                  },
-                                ),
-                              ),
-                            ),
-                          ],
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  ProductDetailScreen(product: product),
                         ),
-                        SizedBox(height: 10),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Text(
-                            product.title.length > 20
-                                ? '${product.title.substring(0, 20)}...'
-                                : product.title,
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Row(
+                      );
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.grey[300]!),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Stack(
                             children: [
-                              Text(
-                                '\$${product.price.toStringAsFixed(2)}',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Color(0xFF6055DB),
-                                  fontWeight: FontWeight.bold,
+                              Container(
+                                height: 150,
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(10),
+                                  ),
+                                  image: DecorationImage(
+                                    image: NetworkImage(product.image),
+                                    fit: BoxFit.cover,
+                                    onError:
+                                        (exception, stackTrace) =>
+                                            Icon(Icons.error, size: 50),
+                                  ),
                                 ),
                               ),
-                              Spacer(),
-                              Container(
-                                height: 30,
-                                width: 30,
-                                decoration: BoxDecoration(
-                                  color: Color(0xFF6055DB),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  Icons.add,
-                                  color: Colors.white,
-                                  size: 20,
+                              Positioned(
+                                top: 10,
+                                right: 10,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: IconButton(
+                                    icon: Icon(
+                                      Icons.favorite_rounded,
+                                      color:
+                                          product.isFavorite
+                                              ? Color(0xFF6055DB)
+                                              : Colors.white,
+                                      size: 25,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        product.isFavorite =
+                                            !product.isFavorite;
+                                      });
+                                    },
+                                  ),
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      ],
+                          SizedBox(height: 10),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Text(
+                              product.title.length > 20
+                                  ? '${product.title.substring(0, 20)}...'
+                                  : product.title,
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Row(
+                              children: [
+                                Text(
+                                  '\$${product.price.toStringAsFixed(2)}',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Color(0xFF6055DB),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Spacer(),
+                                GestureDetector(
+                                  onTap: () {
+                                    // TODO: Add to cart functionality
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Added to cart'),
+                                        duration: Duration(seconds: 1),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    height: 30,
+                                    width: 30,
+                                    decoration: BoxDecoration(
+                                      color: Color(0xFF6055DB),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.add,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },

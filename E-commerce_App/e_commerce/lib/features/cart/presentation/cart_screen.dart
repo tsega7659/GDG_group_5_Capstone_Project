@@ -1,12 +1,13 @@
+import 'package:e_commerce/core/models/product_model.dart';
 import 'package:e_commerce/features/product/presentation/product_list_screen.dart';
 import 'package:flutter/material.dart';
-import '../../../core/models/product_model.dart';
 import 'checkout_screen.dart';
 
 class CartScreen extends StatefulWidget {
   final List<Product> selectedProducts;
 
-  CartScreen({Key? key, required this.selectedProducts}) : super(key: key);
+  const CartScreen({Key? key, required this.selectedProducts})
+    : super(key: key);
 
   @override
   State<CartScreen> createState() => _CartScreenState();
@@ -14,22 +15,51 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   List<Product> cartProducts = [];
+  Map<int, int> productQuantities = {};
 
   @override
   void initState() {
     super.initState();
     cartProducts = widget.selectedProducts;
+    // Initialize quantities for all products
+    for (var product in cartProducts) {
+      productQuantities[product.id] = productQuantities[product.id] ?? 1;
+    }
   }
 
   void addProduct(Product product) {
     setState(() {
-      cartProducts.add(product);
+      if (!cartProducts.any((p) => p.id == product.id)) {
+        cartProducts.add(product);
+        productQuantities[product.id] = 1;
+      } else {
+        // If product already exists, increase quantity
+        productQuantities[product.id] =
+            (productQuantities[product.id] ?? 0) + 1;
+      }
+    });
+  }
+
+  void updateQuantity(int productId, int newQuantity) {
+    if (newQuantity < 1) return;
+    setState(() {
+      productQuantities[productId] = newQuantity;
+    });
+  }
+
+  void removeProduct(int productId) {
+    setState(() {
+      cartProducts.removeWhere((product) => product.id == productId);
+      productQuantities.remove(productId);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    double subtotal = cartProducts.fold(0, (sum, item) => sum + item.price);
+    double subtotal = cartProducts.fold(0, (sum, product) {
+      final quantity = productQuantities[product.id] ?? 1;
+      return sum + (product.price * quantity);
+    });
     double discount = 4;
     double deliveryCharges = 2;
     double total = subtotal - discount + deliveryCharges;
@@ -48,31 +78,71 @@ class _CartScreenState extends State<CartScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.more_vert, color: Colors.black),
-            onPressed: () {},
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                builder:
+                    (context) => Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          leading: const Icon(Icons.delete),
+                          title: const Text('Clear Cart'),
+                          onTap: () {
+                            setState(() {
+                              cartProducts.clear();
+                              productQuantities.clear();
+                            });
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.shopping_bag),
+                          title: const Text('View Order History'),
+                          onTap: () {
+                            // TODO: Implement order history
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
+              );
+            },
           ),
         ],
       ),
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              itemCount: cartProducts.length,
-              itemBuilder: (context, index) {
-                final product = cartProducts[index];
-                return CartItem(
-                  cartItem: CartItemModel(
-                    name: product.title,
-                    brand:
-                        "Brand Name", // Replace with actual brand if available
-                    price: product.price,
-                    imageUrl: product.image,
-                  ),
-                );
-              },
-            ),
+            child:
+                cartProducts.isEmpty
+                    ? const Center(child: Text('Your cart is empty'))
+                    : ListView.builder(
+                      itemCount: cartProducts.length,
+                      itemBuilder: (context, index) {
+                        final product = cartProducts[index];
+                        final quantity = productQuantities[product.id] ?? 1;
+                        return CartItem(
+                          cartItem: CartItemModel(
+                            name: product.title,
+                            brand: product.category,
+                            price: product.price,
+                            imageUrl: product.image,
+                          ),
+                          quantity: quantity,
+                          onQuantityChanged:
+                              (newQuantity) =>
+                                  updateQuantity(product.id, newQuantity),
+                          onDelete: () => removeProduct(product.id),
+                        );
+                      },
+                    ),
           ),
           OrderSummary(
-            totalItems: cartProducts.length,
+            totalItems: cartProducts.fold(
+              0,
+              (sum, product) => sum + (productQuantities[product.id] ?? 1),
+            ),
             subtotal: subtotal,
             discount: discount,
             deliveryCharges: deliveryCharges,
@@ -98,7 +168,9 @@ class _CartScreenState extends State<CartScreen> {
               onPressed: () async {
                 final newProduct = await Navigator.push<Product>(
                   context,
-                  MaterialPageRoute(builder: (context) => ProductListScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => const ProductListScreen(),
+                  ),
                 );
                 if (newProduct != null) {
                   addProduct(newProduct);
@@ -127,15 +199,22 @@ class _CartScreenState extends State<CartScreen> {
                   borderRadius: BorderRadius.circular(30.0),
                 ),
               ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder:
-                        (context) => CheckoutScreen(cartProducts: cartProducts),
-                  ),
-                );
-              },
+              onPressed:
+                  cartProducts.isEmpty
+                      ? null
+                      : () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => CheckoutScreen(
+                                  cartProducts: cartProducts,
+                                  quantities: productQuantities,
+                                  
+                                ),
+                          ),
+                        );
+                      },
               child: const Text(
                 'Check Out',
                 style: TextStyle(color: Colors.white),
@@ -149,9 +228,18 @@ class _CartScreenState extends State<CartScreen> {
 }
 
 class CartItem extends StatelessWidget {
-  const CartItem({Key? key, required this.cartItem}) : super(key: key);
+  const CartItem({
+    Key? key,
+    required this.cartItem,
+    required this.quantity,
+    required this.onQuantityChanged,
+    required this.onDelete,
+  }) : super(key: key);
 
   final CartItemModel cartItem;
+  final int quantity;
+  final Function(int) onQuantityChanged;
+  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -210,14 +298,14 @@ class CartItem extends StatelessWidget {
                           ),
                           child: IconButton(
                             icon: const Icon(Icons.remove, color: Colors.white),
-                            onPressed: () {},
+                            onPressed: () => onQuantityChanged(quantity - 1),
                           ),
                         ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8.0),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: Text(
-                            '02', // Quantity
-                            style: TextStyle(fontSize: 16),
+                            quantity.toString().padLeft(2, '0'),
+                            style: const TextStyle(fontSize: 16),
                           ),
                         ),
                         Container(
@@ -227,14 +315,14 @@ class CartItem extends StatelessWidget {
                           ),
                           child: IconButton(
                             icon: const Icon(Icons.add, color: Colors.white),
-                            onPressed: () {},
+                            onPressed: () => onQuantityChanged(quantity + 1),
                           ),
                         ),
                       ],
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: () {},
+                      onPressed: onDelete,
                     ),
                   ],
                 ),

@@ -19,9 +19,17 @@ class _SignupScreenState extends State<SignupScreen> {
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
   bool _obscure = true;
+  bool _isSignupComplete = false;
 
   @override
   Widget build(BuildContext context) {
+    // If signup is complete, navigate to login
+    if (_isSignupComplete) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushReplacementNamed(context, AppRoutes.login);
+      });
+    }
+
     final purple = const Color(0xFF6C63FF);
 
     return Scaffold(
@@ -30,10 +38,7 @@ class _SignupScreenState extends State<SignupScreen> {
         children: [
           ClipPath(
             clipper: _HeaderClipper(),
-            child: Container(
-              height: 250,
-              color: purple,
-            ),
+            child: Container(height: 250, color: purple),
           ),
           Align(
             alignment: Alignment.bottomCenter,
@@ -41,7 +46,10 @@ class _SignupScreenState extends State<SignupScreen> {
               padding: const EdgeInsets.only(top: 150),
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 32,
+                ),
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
@@ -72,7 +80,8 @@ class _SignupScreenState extends State<SignupScreen> {
                               border: UnderlineInputBorder(),
                             ),
                             validator: (val) {
-                              if (val == null || val.isEmpty) return 'Name required';
+                              if (val == null || val.isEmpty)
+                                return 'Name required';
                               return null;
                             },
                           ),
@@ -96,9 +105,12 @@ class _SignupScreenState extends State<SignupScreen> {
                               border: const UnderlineInputBorder(),
                               suffixIcon: IconButton(
                                 icon: Icon(
-                                  _obscure ? Icons.visibility_off : Icons.visibility,
+                                  _obscure
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
                                 ),
-                                onPressed: () => setState(() => _obscure = !_obscure),
+                                onPressed:
+                                    () => setState(() => _obscure = !_obscure),
                               ),
                             ),
                             validator: Validators.validatePassword,
@@ -117,24 +129,28 @@ class _SignupScreenState extends State<SignupScreen> {
                               borderRadius: BorderRadius.circular(30),
                             ),
                           ),
-                          onPressed: state is AuthLoading
-                              ? null
-                              : () {
-                                  if (_formKey.currentState!.validate()) {
-                                    context.read<AuthBloc>().add(
-                                          SignUpRequested(
-                                            email: _emailCtrl.text.trim(),
-                                            password: _passCtrl.text.trim(),
-                                          ),
-                                        );
-                                  }
-                                },
-                          child: state is AuthLoading
-                              ? const CircularProgressIndicator(color: Colors.white)
-                              : const Text(
-                                  'Sign Up',
-                                  style: TextStyle(fontSize: 18),
-                                ),
+                          onPressed:
+                              state is AuthLoading
+                                  ? null
+                                  : () {
+                                    if (_formKey.currentState!.validate()) {
+                                      context.read<AuthBloc>().add(
+                                        SignUpRequested(
+                                          email: _emailCtrl.text.trim(),
+                                          password: _passCtrl.text.trim(),
+                                        ),
+                                      );
+                                    }
+                                  },
+                          child:
+                              state is AuthLoading
+                                  ? const CircularProgressIndicator(
+                                    color: Colors.white,
+                                  )
+                                  : const Text(
+                                    'Sign Up',
+                                    style: TextStyle(fontSize: 18),
+                                  ),
                         );
                       },
                     ),
@@ -144,7 +160,11 @@ class _SignupScreenState extends State<SignupScreen> {
                       children: [
                         const Text("Already have an account? "),
                         GestureDetector(
-                          onTap: () => Navigator.pushReplacementNamed(context, AppRoutes.login),
+                          onTap:
+                              () => Navigator.pushReplacementNamed(
+                                context,
+                                AppRoutes.login,
+                              ),
                           child: Text(
                             'Log in',
                             style: TextStyle(
@@ -176,13 +196,31 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                   );
                 });
-              } else if (state is AuthAuthenticated) {
+              } else if (state is AuthInitial && _isSignupComplete) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  Navigator.pushReplacementNamed(context, AppRoutes.login); // Ensure this is login
+                  // Show success message
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Account created successfully! Please login.',
+                      ),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
                 });
               }
               return const SizedBox.shrink();
             },
+          ),
+          BlocListener<AuthBloc, AuthState>(
+            listener: (context, state) {
+              if (state is AuthInitial && !_isSignupComplete) {
+                setState(() {
+                  _isSignupComplete = true;
+                });
+              }
+            },
+            child: const SizedBox.shrink(),
           ),
         ],
       ),

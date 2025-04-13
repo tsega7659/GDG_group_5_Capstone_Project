@@ -5,6 +5,7 @@ import 'package:e_commerce/features/authentication/presentation/signup.dart';
 import 'package:e_commerce/features/cart/presentation/cart_screen.dart';
 import 'package:e_commerce/features/home/presentation/home_screen.dart';
 import 'package:e_commerce/features/profile/presentation/profile_screen.dart';
+import 'package:e_commerce/features/profile/presentation/settings_screen.dart';
 import 'package:flutter/material.dart';
 
 class AppRouter {
@@ -47,6 +48,7 @@ class _BottomNavBarState extends State<BottomNavBar>
     const SearchScreen(),
     CartScreen(selectedProducts: []),
     const ProfileScreen(),
+    const SettingsScreen(),
   ];
 
   @override

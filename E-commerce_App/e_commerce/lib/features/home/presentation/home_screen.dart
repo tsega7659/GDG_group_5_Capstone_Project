@@ -1,6 +1,7 @@
 import 'package:e_commerce/features/product/presentation/product_detail_screen.dart';
 import 'package:e_commerce/features/product/presentation/product_list_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/api/api_service.dart';
 import '../../../core/models/product_model.dart';
 
@@ -16,11 +17,19 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Product> _products = []; // All products
   List<Product> _filteredProducts = []; // Filtered products for search
   bool isLoading = false;
+  User? _user;
 
   @override
   void initState() {
     super.initState();
     _fetchProducts();
+    _getUser();
+  }
+
+  void _getUser() {
+    setState(() {
+      _user = FirebaseAuth.instance.currentUser;
+    });
   }
 
   ApiService apiService = ApiService();
@@ -67,17 +76,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   ), // Placeholder image
                 ),
                 const SizedBox(width: 12.0),
-                const Column(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
+                    const Text(
                       'Hello!',
                       style: TextStyle(fontSize: 16, color: Colors.black54),
                     ),
                     Text(
-                      'John William',
-                      style: TextStyle(
+                      _user?.email ?? 'User',
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
@@ -335,12 +344,44 @@ class _HomeScreenState extends State<HomeScreen> {
     String imageUrl,
     Product product,
   ) {
+    return HomeProductCard(
+      name: name,
+      price: price,
+      imageUrl: imageUrl,
+      product: product,
+    );
+  }
+}
+
+class HomeProductCard extends StatefulWidget {
+  final String name;
+  final String price;
+  final String imageUrl;
+  final Product product;
+
+  const HomeProductCard({
+    Key? key,
+    required this.name,
+    required this.price,
+    required this.imageUrl,
+    required this.product,
+  }) : super(key: key);
+
+  @override
+  State<HomeProductCard> createState() => _HomeProductCardState();
+}
+
+class _HomeProductCardState extends State<HomeProductCard> {
+  bool isFavorite = false;
+
+  @override
+  Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProductDetailScreen(product: product),
+            builder: (context) => ProductDetailScreen(product: widget.product),
           ),
         );
       },
@@ -363,14 +404,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       topLeft: Radius.circular(12.0),
                       topRight: Radius.circular(12.0),
                     ),
-                    child: Image.network(imageUrl, fit: BoxFit.cover),
+                    child: Image.network(widget.imageUrl, fit: BoxFit.cover),
                   ),
                 ),
                 const SizedBox(height: 8.0),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: Text(
-                    name,
+                    widget.name,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -378,16 +419,26 @@ class _HomeScreenState extends State<HomeScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: Text(
-                    price,
+                    widget.price,
                     style: const TextStyle(color: Colors.grey),
                   ),
                 ),
               ],
             ),
-            const Positioned(
+            Positioned(
               top: 8.0,
               right: 8.0,
-              child: Icon(Icons.favorite_border, color: Colors.white),
+              child: IconButton(
+                icon: Icon(
+                  isFavorite ? Icons.favorite : Icons.favorite_border,
+                  color: isFavorite ? Colors.deepPurple : Colors.white,
+                ),
+                onPressed: () {
+                  setState(() {
+                    isFavorite = !isFavorite;
+                  });
+                },
+              ),
             ),
           ],
         ),

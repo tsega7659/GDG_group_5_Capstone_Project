@@ -11,34 +11,35 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(MyApp());
+  await Firebase.initializeApp();
+
+  final authRepository = FirebaseAuthRepository();
+
+  runApp(MyApp(authRepository: authRepository));
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({Key? key}) : super(key: key);
+  final FirebaseAuthRepository authRepository;
 
-  final _authRepo = FirebaseAuthRepository();
-  late final _checkAuth = CheckAuthStatusUseCase(_authRepo);
-  late final _loginUC = LoginUseCase(_authRepo);
-  late final _signupUC = SignupUseCase(_authRepo);
-  late final _logoutUC = LogoutUseCase(_authRepo);
+  const MyApp({Key? key, required this.authRepository}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create:
-          (_) => AuthBloc(
-            authRepository: _authRepo,
-            checkAuth: _checkAuth,
-            login: _loginUC,
-            signup: _signupUC,
-            logout: _logoutUC,
-          )..add(AuthCheckRequested()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthBloc>(
+          create: (context) => AuthBloc(authRepository: authRepository),
+        ),
+      ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        initialRoute: AppRoutes.login,
+        title: 'E-commerce App',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
         onGenerateRoute: AppRouter.generateRoute,
+        initialRoute: AppRoutes.login,
       ),
     );
   }
