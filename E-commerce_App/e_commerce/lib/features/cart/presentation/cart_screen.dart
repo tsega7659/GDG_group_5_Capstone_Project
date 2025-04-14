@@ -21,7 +21,6 @@ class _CartScreenState extends State<CartScreen> {
   void initState() {
     super.initState();
     cartProducts = widget.selectedProducts;
-    // Initialize quantities for all products
     for (var product in cartProducts) {
       productQuantities[product.id] = productQuantities[product.id] ?? 1;
     }
@@ -33,7 +32,6 @@ class _CartScreenState extends State<CartScreen> {
         cartProducts.add(product);
         productQuantities[product.id] = 1;
       } else {
-        // If product already exists, increase quantity
         productQuantities[product.id] =
             (productQuantities[product.id] ?? 0) + 1;
       }

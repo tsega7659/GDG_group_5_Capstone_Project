@@ -23,7 +23,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // If signup is complete, navigate to login
     if (_isSignupComplete) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.pushReplacementNamed(context, AppRoutes.login);
@@ -198,7 +197,6 @@ class _SignupScreenState extends State<SignupScreen> {
                 });
               } else if (state is AuthInitial && _isSignupComplete) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  // Show success message
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text(

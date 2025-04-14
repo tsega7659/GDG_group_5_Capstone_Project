@@ -14,8 +14,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
-  List<Product> _products = []; // All products
-  List<Product> _filteredProducts = []; // Filtered products for search
+  List<Product> _products = []; 
+  List<Product> _filteredProducts = []; 
   bool isLoading = false;
   User? _user;
 
@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
       List<Product> products = await apiService.getProducts();
       setState(() {
         _products = products;
-        _filteredProducts = _products; // Initially show all products
+        _filteredProducts = _products;
         isLoading = false;
       });
     } catch (e) {
@@ -73,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   radius: 30,
                   backgroundImage: AssetImage(
                     'assets/images/profile_1.jpeg',
-                  ), // Placeholder image
+                  ), 
                 ),
                 const SizedBox(width: 12.0),
                 Column(
@@ -101,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: Colors.black87,
                   ),
                   onPressed: () {
-                    // TODO: Implement notification action
+                    
                   },
                 ),
               ],
@@ -268,7 +268,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               product.title,
                               '\$${product.price}',
                               product.image,
-                              product, // Pass the product object
+                              product, 
                             );
                           }).toList(),
                     ),
@@ -323,7 +323,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   : product.title,
                               '\$${product.price}',
                               product.image,
-                              product, // Pass the product object
+                              product, 
                             );
                           }).toList(),
                     ),

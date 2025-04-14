@@ -69,10 +69,7 @@ class _SettingsScreenState extends State<SettingsScreen>
     );
 
     if (shouldSignOut == true && mounted) {
-      // Dispatch logout event to AuthBloc
       context.read<AuthBloc>().add(LogoutRequested());
-
-      // Navigate to login screen and remove all previous routes
       Navigator.of(
         context,
       ).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);

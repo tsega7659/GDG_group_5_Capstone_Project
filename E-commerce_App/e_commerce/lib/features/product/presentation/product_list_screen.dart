@@ -27,7 +27,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
       setState(() {
         _activeFilters = result;
       });
-      // Trigger product list refresh with new filters
       context.read<ProductListBloc>().add(LoadProductList());
     }
   }
@@ -36,15 +35,12 @@ class _ProductListScreenState extends State<ProductListScreen> {
     if (_activeFilters == null) return products;
 
     return products.where((product) {
-      // Apply gender filter
       if (_activeFilters!['gender'] != 'All' &&
           !(product.category?.toLowerCase() ?? '').contains(
             _activeFilters!['gender'].toLowerCase(),
           )) {
         return false;
       }
-
-      // Apply brand filter
       if (_activeFilters!['brands'].isNotEmpty &&
           !_activeFilters!['brands'].any(
             (brand) =>
@@ -52,14 +48,10 @@ class _ProductListScreenState extends State<ProductListScreen> {
           )) {
         return false;
       }
-
-      // Apply price filter
       final RangeValues priceRange = _activeFilters!['priceRange'];
       if (product.price < priceRange.start || product.price > priceRange.end) {
         return false;
       }
-
-      // Apply color filter (assuming product has a color property or it's in the description)
       if (_activeFilters!['colors'].isNotEmpty) {
         bool hasMatchingColor = _activeFilters!['colors'].any(
           (color) =>
@@ -194,19 +186,13 @@ class _ProductCardState extends State<ProductCard> {
   Future<void> _addToCart(Product product, BuildContext context) async {
     try {
       final apiService = ApiService();
-      // First get existing carts for the user
       final cartItem = {
-        "userId": 1, // Replace with actual user ID when you have authentication
+        "userId": 1, 
         "date": DateTime.now().toIso8601String(),
         "products": [
           {"productId": product.id, "quantity": 1},
         ],
       };
-
-      // Send POST request to add item to cart
-      await apiService.post('carts', cartItem);
-
-      // Show success message
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

@@ -358,7 +358,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           backgroundColor: Theme.of(context).primaryColor,
         ),
         onPressed: () {
-          // Show order confirmation dialog
           showDialog(
             context: context,
             builder:

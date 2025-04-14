@@ -2,34 +2,34 @@ class Product {
   final int id;
   final String title;
   final double price;
-  final String? description; // Nullable, from HEAD
-  final String category; // From eyosi-signup
+  final String? description; 
+  final String category; 
   final String image;
-  bool isFavorite; // From HEAD
+  bool isFavorite; 
 
   Product({
     required this.id,
     required this.title,
     required this.price,
-    this.description, // Optional, from HEAD
-    required this.category, // Required, from eyosi-signup
+    this.description, 
+    required this.category, 
     required this.image,
-    this.isFavorite = false, // Default value from HEAD
+    this.isFavorite = false, 
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
-      id: json['id'] as int, // Strict int, common in APIs
-      title: json['title'] as String? ?? '', // Fallback to empty string
+      id: json['id'] as int, 
+      title: json['title'] as String? ?? '', 
       price:
           (json['price'] is int)
               ? (json['price'] as int).toDouble()
               : (json['price'] as num)
-                  .toDouble(), // Flexible handling from HEAD
-      description: json['description'] as String?, // Nullable, from HEAD
-      category: json['category'] as String? ?? 'Uncategorized', // Fallback
-      image: json['image'] as String? ?? '', // Fallback to empty string
-      isFavorite: json['isFavorite'] as bool? ?? false, // From HEAD
+                  .toDouble(), 
+      description: json['description'] as String?,
+      category: json['category'] as String? ?? 'Uncategorized', 
+      image: json['image'] as String? ?? '', 
+      isFavorite: json['isFavorite'] as bool? ?? false, 
     );
   }
 
@@ -41,7 +41,7 @@ class Product {
       'description': description,
       'category': category,
       'image': image,
-      'isFavorite': isFavorite, // From HEAD
+      'isFavorite': isFavorite, 
     };
   }
 }

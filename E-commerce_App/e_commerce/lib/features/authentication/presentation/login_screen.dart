@@ -68,7 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             decoration: const InputDecoration(
                               prefixIcon: Icon(
                                 Icons.email,
-                              ), // Fixed icon to match field
+                              ), 
                               hintText: 'Email',
                               border: UnderlineInputBorder(),
                             ),
@@ -110,7 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           onPressed:
                               state is AuthLoading
-                                  ? null // Disable button during loading
+                                  ? null 
                                   : () {
                                     if (_formKey.currentState!.validate()) {
                                       context.read<AuthBloc>().add(
@@ -190,7 +190,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Navigator.pushReplacementNamed(
                     context,
                     AppRoutes.home,
-                  ); // Redirect to home
+                  ); 
                 });
               }
               return const SizedBox.shrink();

@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
-import 'package:e_commerce/core/models/user_model.dart'; // Import your domain User model
+import 'package:e_commerce/core/models/user_model.dart'; 
 
 class AuthRepository {
   final firebase_auth.FirebaseAuth _firebaseAuth;
@@ -13,9 +13,9 @@ class AuthRepository {
     );
     return User(
       id: userCredential.user!.uid,
-      name: userCredential.user!.displayName ?? '', // Add if required
-      email: userCredential.user!.email ?? '', // Add if required
-    ); // Use the domain User class
+      name: userCredential.user!.displayName ?? '', 
+      email: userCredential.user!.email ?? '',
+    ); 
   }
 
   Future<User> signUp({required String email, required String password}) async {
@@ -25,9 +25,9 @@ class AuthRepository {
     );
     return User(
       id: userCredential.user!.uid,
-      name: userCredential.user!.displayName ?? '', // Add if required
-      email: userCredential.user!.email ?? '', // Add if required
-    ); // Use the domain User class
+      name: userCredential.user!.displayName ?? '', 
+      email: userCredential.user!.email ?? '', 
+    ); 
   }
 
   Future<User?> getCurrentUser() async {
@@ -35,10 +35,10 @@ class AuthRepository {
     return user != null
         ? User(
           id: user.uid,
-          name: user.displayName ?? '', // Add if required
-          email: user.email ?? '', // Add if required
+          name: user.displayName ?? '', 
+          email: user.email ?? '', 
         )
-        : null; // Use the domain User class
+        : null;
   }
 
   Future<void> logout() async {

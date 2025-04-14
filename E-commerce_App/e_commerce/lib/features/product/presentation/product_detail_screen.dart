@@ -121,7 +121,7 @@ class ProductDetailScreen extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) => CartScreen(
-                          selectedProducts: [product], // Pass the product to CartScreen
+                          selectedProducts: [product], 
                         ),
                       ),
                     );

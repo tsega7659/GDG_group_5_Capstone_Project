@@ -85,7 +85,6 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   @override
   Widget build(BuildContext context) {
-    // If signing out is complete, navigate to login
     if (_isSigningOut) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.pushNamedAndRemoveUntil(
@@ -192,7 +191,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                         icon: Icons.person,
                         title: 'Profile',
                         onTap: () {
-                          // Handle profile tap
                         },
                       ),
                       _buildProfileItem(
@@ -211,21 +209,18 @@ class _ProfileScreenState extends State<ProfileScreen>
                         icon: Icons.mail,
                         title: 'Contact',
                         onTap: () {
-                          // Handle contact tap
                         },
                       ),
                       _buildProfileItem(
                         icon: Icons.share,
                         title: 'Share App',
                         onTap: () {
-                          // Handle share app tap
                         },
                       ),
                       _buildProfileItem(
                         icon: Icons.question_mark_outlined,
                         title: 'Help',
                         onTap: () {
-                          // Handle help tap
                         },
                       ),
                     ],
@@ -251,7 +246,6 @@ class _ProfileScreenState extends State<ProfileScreen>
               ),
             ),
           ),
-          // Loading overlay with Lottie animation
           BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state) {
               if (state is AuthLoading) {
@@ -270,7 +264,6 @@ class _ProfileScreenState extends State<ProfileScreen>
               return const SizedBox.shrink();
             },
           ),
-          // State listener for navigation
           BlocListener<AuthBloc, AuthState>(
             listener: (context, state) {
               if (state is AuthInitial && !_isSigningOut) {

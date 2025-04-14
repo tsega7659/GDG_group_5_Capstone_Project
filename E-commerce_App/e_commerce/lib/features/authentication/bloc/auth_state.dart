@@ -10,7 +10,7 @@ class AuthInitial extends AuthState {}
 class AuthLoading extends AuthState {}
 
 class AuthAuthenticated extends AuthState {
-  final String userId; // or a User model
+  final String userId; 
 
   AuthAuthenticated({required this.userId});
 

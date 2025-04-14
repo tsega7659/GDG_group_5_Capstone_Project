@@ -272,7 +272,6 @@ class _SearchScreenState extends State<SearchScreen> {
                                 Spacer(),
                                 GestureDetector(
                                   onTap: () {
-                                    // TODO: Add to cart functionality
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text('Added to cart'),
